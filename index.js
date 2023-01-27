@@ -58,6 +58,21 @@ app.get('/api/tables', (req, res) => {
   });
 });
 
+// Get table schema
+app.get('/api/:tableName', (req, res) => {
+  const tableName = req.params.tableName;
+  pool.query(`SELECT column_name, data_type
+  FROM information_schema.columns
+  WHERE table_name = $1;`, [tableName], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
+
 // Get selected table data
 app.post('/api/tableData', async (req, res) => {  
   const query = req.body.query; //'SELECT * FROM users'

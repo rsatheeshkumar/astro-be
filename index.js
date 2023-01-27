@@ -62,7 +62,7 @@ app.get('/api/tables', (req, res) => {
 // Get table schema
 app.get('/api/:tableName', (req, res) => {
   const tableName = req.params.tableName;
-  pool.query(`SELECT column_name, data_type, is_nullable, column_default
+  pool.query(`SELECT ordinal_position, column_name, data_type, is_nullable, column_default
   FROM information_schema.columns
   WHERE table_name = $1;`, [tableName], (err, result) => {
     if (err) {

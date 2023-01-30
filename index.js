@@ -73,6 +73,39 @@ app.get('/api/:tableName', (req, res) => {
   });
 });
 
+// Get indexes
+
+app.get('/api/indexes/:tableName', (req, res) => {
+  const tableName = req.params.tableName;
+  pool.query(`SELECT
+  t.relname AS table_name,
+  i.relname AS index_name,
+  i.relam AS index_algorithm,
+  a.attname AS column_name,
+  ix.indisunique AS in_unique,
+  pg_get_expr(ix.indpred, t.oid) AS conditions
+FROM
+  pg_class t,
+  pg_class i,
+  pg_index ix,
+  pg_attribute a
+WHERE
+  t.oid = ix.indrelid
+  AND i.oid = ix.indexrelid
+  AND a.attrelid = t.oid
+  AND a.attnum = ANY(ix.indkey)
+  AND t.relname = $1
+ORDER BY
+  t.relname,
+  i.relname;`, [tableName], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
+
 
 // Get selected table data
 app.post('/api/tableData', async (req, res) => {  

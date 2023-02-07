@@ -73,8 +73,22 @@ app.get('/api/:tableName', (req, res) => {
   });
 });
 
-// Get indexes
+// Get table columns name
+app.get('/api/columns/:tableName', (req, res) => {
+  const tableName = req.params.tableName;
+  pool.query(`      SELECT COLUMN_NAME
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_NAME = $1`, [tableName], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(result.rows);
+    }
+  });
+});
 
+
+// Get indexes
 app.get('/api/indexes/:tableName', (req, res) => {
   const tableName = req.params.tableName;
   pool.query(`SELECT

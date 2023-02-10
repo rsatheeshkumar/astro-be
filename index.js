@@ -1,6 +1,6 @@
 // Entry Point of the API Server
 const express = require('express');
-
+const  cors = require('cors');
 const app = express();
 const Pool = require('pg').Pool;
 
@@ -30,7 +30,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
+app.use(cors())
 // pools[cookie_ID].query
 
 

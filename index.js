@@ -5,14 +5,20 @@ const app = express();
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
-	user: 'satheesh',
-	host: 'dpg-cehdn46n6mpg3l6dej4g-a.singapore-postgres.render.com',
-	database: 'astro_av06',
-	password: 'UGSrVLMIjNvxdYgLxxqWS2HoZ5aAd8AT',
-	dialect: 'postgres',
-	port: 5432,
+  user: 'satheesh',
+  host: 'dpg-cehdn46n6mpg3l6dej4g-a.singapore-postgres.render.com',
+  database: 'astro_av06',
+  password: 'UGSrVLMIjNvxdYgLxxqWS2HoZ5aAd8AT',
+  dialect: 'postgres',
+  port: 5432,
   ssl: true
 });
+
+// const pools = {
+//   'ljflajdfa': new Pool()
+// }
+
+// pools["flsjsldjl"] = new Pool()
 
 
 /* To handle the HTTP Methods Body Parser
@@ -25,19 +31,22 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
+// pools[cookie_ID].query
+
+
 pool.connect((err, client, release) => {
-	if (err) {
-		return console.error(
-			'Error acquiring client', err.stack)
-	}
-	client.query('SELECT NOW()', (err, result) => {
-		release()
-		if (err) {
-			return console.error(
-				'Error executing query', err.stack)
-		}
-		console.log("Connected to Database !")
-	})
+  if (err) {
+    return console.error(
+      'Error acquiring client', err.stack)
+  }
+  client.query('SELECT NOW()', (err, result) => {
+    release()
+    if (err) {
+      return console.error(
+        'Error executing query', err.stack)
+    }
+    console.log("Connected to Database !")
+  })
 })
 
 app.get('/users', (req, res) => {
@@ -122,26 +131,62 @@ ORDER BY
 
 
 // Get selected table data
-app.post('/api/tableData', async (req, res) => {  
+app.post('/api/tableData', async (req, res) => {
   const query = req.body.query; //'SELECT * FROM users'
   try {
     const result = await pool.query(query)
     return res.send({ result: result.rows });
   } catch (error) {
     console.error(error);
-    return res.status(400).send({errors: error})
+    return res.status(400).send({ errors: error })
   }
-})
+});
+
+// Update table row data
+app.put('/update/:tableName', (req, res) => {
+  try {
+    const tableName = req.params.tableName;
+    const data = req.body;
+    let query = `UPDATE ${tableName} SET `;
+    let id;
+
+    // create query based on dynamic data
+    for (const key in data) {
+      if (key === 'id') {
+        id = data[key];
+        continue;
+      }
+      query += `${key} = '${data[key]}',`;
+    }
+    
+    // remove trailing comma
+    query = query.slice(0, -1);
+    query += ` WHERE id = ${id}`;
+
+    // execute query
+    pool.query(query, (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ error: 'Error executing query' });
+      }
+      // return success status
+      res.status(200).send({ message: `${results.rowCount} row(s) updated` });
+    });
+  } catch (err) {
+    res.status(500).send({ message: 'Failed to update data' });
+    console.error(err.stack);
+  }
+});
 
 // CRUD table in databae via http request
-app.post('/api/query', async (req, res) => {  
+app.post('/api/query', async (req, res) => {
   const query = req.body.query; //'CREATE TABLE anotherusers ( id serial PRIMARY KEY, name varchar(255) NOT NULL, email varchar(255) UNIQUE NOT NULL, password varchar(255) NOT NULL)'
   try {
     await pool.query(query)
     return res.send();
   } catch (error) {
     console.error(error);
-    return res.status(400).send({errors: error})
+    return res.status(400).send({ errors: error })
   }
 })
 

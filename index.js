@@ -143,7 +143,7 @@ app.post('/api/tableData', async (req, res) => {
 });
 
 // Update table row data
-app.put('/update/:tableName', (req, res) => {
+app.put('/api/update/:tableName', (req, res) => {
   try {
     const tableName = req.params.tableName;
     const data = req.body;

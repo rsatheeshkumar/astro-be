@@ -6,9 +6,9 @@ const Pool = require('pg').Pool;
 
 const pool = new Pool({
   user: 'satheesh',
-  host: 'dpg-cehdn46n6mpg3l6dej4g-a.singapore-postgres.render.com',
-  database: 'astro_av06',
-  password: 'UGSrVLMIjNvxdYgLxxqWS2HoZ5aAd8AT',
+  host: 'dpg-cgcomgu4dad6fr61rr10-a.singapore-postgres.render.com',
+  database: 'astro_2r9g',
+  password: 'TtflSu1DQELjdXCXSjqWhJI1Eiftoza3',
   dialect: 'postgres',
   port: 5432,
   ssl: true
